@@ -1,24 +1,24 @@
 package domain
 
-type Activity struct {
-	Id    int64  `gorm:"primaryKey;not null" json:"id"`
-	Title string `gorm:"type:varchar" json:"title" validate:"required"`
-	Email string `gorm:"type:varchar" json:"email"`
+type Activities struct {
+	Id    int64  `gorm:"primaryKey" json:"activity_id"`
+	Title string `gorm:"type:varchar(255)" json:"title"`
+	Email string `gorm:"type:varchar(255)" json:"email"`
 	Model
 }
 
 type ActivityUseCase interface {
-	GetAll() []Activity
-	GetByID(id uint) Activity
-	Create(activity *Activity) error
-	Update(id uint, activity *Activity) (Activity, error)
+	GetAll() []Activities
+	GetByID(id uint) Activities
+	Create(activity *Activities) error
+	Update(id uint, activity *Activities) (Activities, error)
 	Delete(id uint) error
 }
 
 type ActivityRepository interface {
-	GetAll() []Activity
-	GetByID(id uint) Activity
-	Create(activity *Activity) error
-	Update(id uint, activity *Activity) (Activity, error)
+	GetAll() []Activities
+	GetByID(id uint) Activities
+	Create(activity *Activities) error
+	Update(id uint, activity *Activities) (Activities, error)
 	Delete(id uint) error
 }

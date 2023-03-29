@@ -16,31 +16,31 @@ func NewActivityRepository(db domain.DB) domain.ActivityRepository {
 	}
 }
 
-func (r *activityRepository) GetAll() (activities []domain.Activity) {
+func (r *activityRepository) GetAll() (activities []domain.Activities) {
 	connection := r.db.GetConnection()
 	connection.Find(&activities)
 	return activities
 }
 
-func (r *activityRepository) GetByID(id uint) (activity domain.Activity) {
+func (r *activityRepository) GetByID(id uint) (activity domain.Activities) {
 	connection := r.db.GetConnection()
 	connection.First(&activity, "id = ?", id)
 	return activity
 }
 
-func (r *activityRepository) Create(activity *domain.Activity) error {
+func (r *activityRepository) Create(activity *domain.Activities) error {
 	connection := r.db.GetConnection()
 	result := connection.Create(&activity)
 	return result.Error
 }
 
-func (r *activityRepository) Update(id uint, activity *domain.Activity) (domain.Activity, error) {
-	var old *domain.Activity
+func (r *activityRepository) Update(id uint, activity *domain.Activities) (domain.Activities, error) {
+	var old *domain.Activities
 
 	connection := r.db.GetConnection()
 	connection.First(&old, "id = ?", id)
 	if old.Id == 0 {
-		return domain.Activity{}, errors.New("data not found")
+		return domain.Activities{}, errors.New("data not found")
 	}
 
 	result := connection.Model(&old).Updates(&activity)
@@ -49,7 +49,7 @@ func (r *activityRepository) Update(id uint, activity *domain.Activity) (domain.
 
 func (r *activityRepository) Delete(id uint) error {
 	connection := r.db.GetConnection()
-	var old *domain.Activity
+	var old *domain.Activities
 
 	connection.First(&old, "id = ?", id)
 	if old.Id == 0 {

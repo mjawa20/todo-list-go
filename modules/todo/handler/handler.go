@@ -51,12 +51,12 @@ func (h *todoHandler) GetByID(c *fiber.Ctx) error {
 }
 
 func (h *todoHandler) Create(c *fiber.Ctx) error {
-	todo := new(domain.Todo)
+	todo := new(domain.Todos)
 	if err := c.BodyParser(todo); err != nil {
 		return err
 	}
 
-	if (*todo == domain.Todo{}) {
+	if (*todo == domain.Todos{}) {
 		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
 	}
 
@@ -73,7 +73,7 @@ func (h *todoHandler) Update(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-	todo := new(domain.Todo)
+	todo := new(domain.Todos)
 	if err := c.BodyParser(todo); err != nil {
 		return err
 	}

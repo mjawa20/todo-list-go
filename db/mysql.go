@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/mjawa20/todo-list-go.git/domain"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -14,22 +14,22 @@ type db struct {
 	db *gorm.DB
 }
 
-func NewPostgres() domain.DB {
+func NewMysql() domain.DB {
 	db := db{}
 	db.initConnection()
 	return &db
 }
 
 func (d *db) initConnection() {
-	dbName := os.Getenv("DB_NAME")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USERNAME")
-	dbPass := os.Getenv("DB_PASSWORD")
-	dbHost := os.Getenv("DB_HOST")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta", dbHost, dbUser, dbPass, dbName, dbPort)
-
+	dbName := os.Getenv("MYSQL_DBNAME")
+	dbPort := os.Getenv("MYSQL_PORT")
+	dbUser := os.Getenv("MYSQL_USER")
+	dbPass := os.Getenv("MYSQL_PASSWORD")
+	dbHost := os.Getenv("MYSQL_HOST")
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbName)
+	fmt.Println(dsn)
 	var err error
-	d.db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	d.db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
@@ -51,7 +51,7 @@ func (d *db) GetConnection() *gorm.DB {
 
 func (d *db) migrate() {
 	d.db.AutoMigrate(
-		domain.Activity{},
-		domain.Todo{},
+		domain.Activities{},
+		domain.Todos{},
 	)
 }

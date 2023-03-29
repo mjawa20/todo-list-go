@@ -12,7 +12,7 @@ import (
 )
 
 func Setup(f *fiber.App) {
-	db := db.NewPostgres()
+	db := db.NewMysql()
 
 	activityRepository := _activityRepository.NewActivityRepository(db)
 	activityUsecase := _activityUsecase.NewActivityUsecase(activityRepository)

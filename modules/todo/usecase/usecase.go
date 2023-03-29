@@ -12,19 +12,19 @@ func NewTodoUsecase(repository domain.TodoRepository) domain.TodoUseCase {
 	}
 }
 
-func (u *todoUsecase) GetAll(id uint) []domain.Todo {
+func (u *todoUsecase) GetAll(id uint) []domain.Todos {
 	return u.repository.GetAll(id)
 }
 
-func (u *todoUsecase) GetByID(id uint) domain.Todo {
+func (u *todoUsecase) GetByID(id uint) domain.Todos {
 	return u.repository.GetByID(id)
 }
 
-func (u *todoUsecase) Create(todo *domain.Todo) error {
+func (u *todoUsecase) Create(todo *domain.Todos) error {
 	return u.repository.Create(todo)
 }
 
-func (u *todoUsecase) Update(id uint, todo *domain.Todo) (domain.Todo, error) {
+func (u *todoUsecase) Update(id uint, todo *domain.Todos) (domain.Todos, error) {
 	return u.repository.Update(id, todo)
 }
 

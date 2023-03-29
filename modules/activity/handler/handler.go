@@ -44,12 +44,12 @@ func (h *activityHandler) GetByID(c *fiber.Ctx) error {
 }
 
 func (h *activityHandler) Create(c *fiber.Ctx) error {
-	activity := new(domain.Activity)
+	activity := new(domain.Activities)
 	if err := c.BodyParser(activity); err != nil {
 		return err
 	}
 
-	if (*activity == domain.Activity{}) {
+	if (*activity == domain.Activities{}) {
 		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
 	}
 
@@ -66,12 +66,12 @@ func (h *activityHandler) Update(c *fiber.Ctx) error {
 		fmt.Println(errID)
 	}
 
-	activity := new(domain.Activity)
+	activity := new(domain.Activities)
 	if err := c.BodyParser(activity); err != nil {
 		return err
 	}
 
-	if (*activity == domain.Activity{}) {
+	if (*activity == domain.Activities{}) {
 		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
 	}
 
@@ -100,5 +100,5 @@ func (h *activityHandler) Delete(c *fiber.Ctx) error {
 		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
 	}
 
-	return domain.ResponseBuilder(c, "Success", 200, "activity was deleted", domain.Activity{})
+	return domain.ResponseBuilder(c, "Success", 200, "activity was deleted", domain.Activities{})
 }

@@ -5,6 +5,5 @@ import (
 )
 
 type Model struct {
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	CreatedAt *time.Time `gorm:"type:timestamp" json:"createdAt,omitempty"`
 }

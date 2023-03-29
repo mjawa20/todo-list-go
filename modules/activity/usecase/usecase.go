@@ -12,19 +12,19 @@ func NewActivityUsecase(repository domain.ActivityRepository) domain.ActivityUse
 	}
 }
 
-func (u *activityUsecase) GetAll() []domain.Activity {
+func (u *activityUsecase) GetAll() []domain.Activities {
 	return u.repository.GetAll()
 }
 
-func (u *activityUsecase) GetByID(id uint) domain.Activity {
+func (u *activityUsecase) GetByID(id uint) domain.Activities {
 	return u.repository.GetByID(id)
 }
 
-func (u *activityUsecase) Create(activity *domain.Activity) error {
+func (u *activityUsecase) Create(activity *domain.Activities) error {
 	return u.repository.Create(activity)
 }
 
-func (u *activityUsecase) Update(id uint, activity *domain.Activity) (domain.Activity, error) {
+func (u *activityUsecase) Update(id uint, activity *domain.Activities) (domain.Activities, error) {
 	return u.repository.Update(id, activity)
 }
 

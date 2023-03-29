@@ -16,7 +16,7 @@ func NewTodoRepository(db domain.DB) domain.TodoRepository {
 	}
 }
 
-func (r *todoRepository) GetAll(id uint) (todos []domain.Todo) {
+func (r *todoRepository) GetAll(id uint) (todos []domain.Todos) {
 	connection := r.db.GetConnection()
 
 	if id == 0 {
@@ -27,26 +27,26 @@ func (r *todoRepository) GetAll(id uint) (todos []domain.Todo) {
 	return todos
 }
 
-func (r *todoRepository) GetByID(id uint) (todo domain.Todo) {
+func (r *todoRepository) GetByID(id uint) (todo domain.Todos) {
 	connection := r.db.GetConnection()
 	connection.First(&todo, "id = ?", id)
 	return todo
 }
 
-func (r *todoRepository) Create(todo *domain.Todo) error {
+func (r *todoRepository) Create(todo *domain.Todos) error {
 	connection := r.db.GetConnection()
 	todo.Priority = "very-high"
 	result := connection.Create(&todo)
 	return result.Error
 }
 
-func (r *todoRepository) Update(id uint, todo *domain.Todo) (domain.Todo, error) {
-	var old *domain.Todo
+func (r *todoRepository) Update(id uint, todo *domain.Todos) (domain.Todos, error) {
+	var old *domain.Todos
 
 	connection := r.db.GetConnection()
 	connection.First(&old, "id = ?", id)
 	if old.Id == 0 {
-		return domain.Todo{}, errors.New("data not found")
+		return domain.Todos{}, errors.New("data not found")
 	}
 
 	newTodo := map[string]interface{}{
@@ -61,7 +61,7 @@ func (r *todoRepository) Update(id uint, todo *domain.Todo) (domain.Todo, error)
 
 func (r *todoRepository) Delete(id uint) error {
 	connection := r.db.GetConnection()
-	var old *domain.Todo
+	var old *domain.Todos
 
 	connection.First(&old, "id = ?", id)
 	if old.Id == 0 {
