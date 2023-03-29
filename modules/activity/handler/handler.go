@@ -20,7 +20,7 @@ func NewActivityHandler(r fiber.Router, activityUseCase domain.ActivityUseCase) 
 	r.Get("/activity-groups", handler.GetAll)
 	r.Get("/activity-groups/:id", handler.GetByID)
 	r.Post("/activity-groups", handler.Create)
-	r.Patch("/activity-groups", handler.Update)
+	r.Patch("/activity-groups/:id", handler.Update)
 	r.Delete("/activity-groups/:id", handler.Delete)
 }
 
@@ -36,6 +36,9 @@ func (h *activityHandler) GetByID(c *fiber.Ctx) error {
 	}
 
 	activity := h.activityUseCase.GetByID(uint(id))
+	if activity.Id == 0 {
+		return domain.ResponseBuilder(c, "Not Found", 404, "Activity with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+	}
 
 	return domain.ResponseBuilder(c, "Success", 200, "Success", activity)
 }
@@ -45,36 +48,57 @@ func (h *activityHandler) Create(c *fiber.Ctx) error {
 	if err := c.BodyParser(activity); err != nil {
 		return err
 	}
+
+	if activity.Title == "" {
+		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
+	}
+
 	err := h.activityUseCase.Create(activity)
 	if err != nil {
-		return domain.ResponseBuilder(c, "Error", 400, err.Error(), nil)
+		return domain.ResponseBuilder(c, "Error", 404, err.Error(), nil)
 	}
 	return domain.ResponseBuilder(c, "Success", 200, "Success", activity)
 }
 
 func (h *activityHandler) Update(c *fiber.Ctx) error {
+	id, errID := strconv.ParseUint(c.Params("id"), 10, 32)
+	if errID != nil {
+		fmt.Println(errID)
+	}
+
 	activity := new(domain.Activity)
 	if err := c.BodyParser(activity); err != nil {
 		return err
 	}
-	err := h.activityUseCase.Update(activity)
-	if err != nil {
-		return domain.ResponseBuilder(c, "Error", 400, err.Error(), nil)
+
+	if (*activity == domain.Activity{}) {
+		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
 	}
-	return domain.ResponseBuilder(c, "Success", 200, "Success", activity)
+
+	newActivity, err := h.activityUseCase.Update(uint(id), activity)
+	if err != nil {
+		if err.Error() == "data not found" {
+			return domain.ResponseBuilder(c, "Not Found", 404, "Activity with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+		}
+		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
+	}
+	return domain.ResponseBuilder(c, "Success", 200, "Success", newActivity)
 
 }
 
 func (h *activityHandler) Delete(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		return domain.ResponseBuilder(c, "Error", 400, err.Error(), nil)
+		fmt.Println(err)
 	}
 
 	err = h.activityUseCase.Delete(uint(id))
 	if err != nil {
-		return domain.ResponseBuilder(c, "Not Found", 404, "Activity with Id"+strconv.Itoa(id)+"Not Found", nil)
+		if err.Error() == "data not found" {
+			return domain.ResponseBuilder(c, "Not Found", 404, "Activity with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+		}
+		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
 	}
 
-	return domain.ResponseBuilder(c, "Success", 200, "activity was deleted", nil)
+	return domain.ResponseBuilder(c, "Success", 200, "activity was deleted", domain.Activity{})
 }

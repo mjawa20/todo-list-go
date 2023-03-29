@@ -24,8 +24,8 @@ func (u *activityUsecase) Create(activity *domain.Activity) error {
 	return u.repository.Create(activity)
 }
 
-func (u *activityUsecase) Update(activity *domain.Activity) error {
-	return u.repository.Update(activity)
+func (u *activityUsecase) Update(id uint, activity *domain.Activity) (domain.Activity, error) {
+	return u.repository.Update(id, activity)
 }
 
 func (u *activityUsecase) Delete(id uint) error {

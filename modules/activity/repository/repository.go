@@ -1,6 +1,10 @@
 package repository
 
-import "github.com/mjawa20/todo-list-go.git/domain"
+import (
+	"errors"
+
+	"github.com/mjawa20/todo-list-go.git/domain"
+)
 
 type activityRepository struct {
 	db domain.DB
@@ -30,23 +34,33 @@ func (r *activityRepository) Create(activity *domain.Activity) error {
 	return result.Error
 }
 
-func (r *activityRepository) Update(activity *domain.Activity) error {
+func (r *activityRepository) Update(id uint, activity *domain.Activity) (domain.Activity, error) {
 	var old *domain.Activity
 
 	connection := r.db.GetConnection()
-	connection.First(&old, "id = ?", activity.Id)
+	connection.First(&old, "id = ?", id)
+	if old.Id == 0 {
+		return domain.Activity{}, errors.New("data not found")
+	}
 
-	old = activity
-
-	result := connection.Save(&old)
-	return result.Error
+	result := connection.Model(&old).Updates(&activity)
+	return *old, result.Error
 }
 
 func (r *activityRepository) Delete(id uint) error {
-	connnection := r.db.GetConnection()
-	delete := connnection.Delete(&domain.Activity{Id: int64(id)})
+	connection := r.db.GetConnection()
+	var old *domain.Activity
+
+	connection.First(&old, "id = ?", id)
+	if old.Id == 0 {
+		return errors.New("data not found")
+	}
+
+	delete := connection.Delete(&old)
+
 	if delete.Error != nil {
 		return delete.Error
 	}
+
 	return nil
 }
