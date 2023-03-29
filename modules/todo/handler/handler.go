@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,7 +20,7 @@ func NewTodoHandler(r fiber.Router, todoUseCase domain.TodoUseCase) {
 	r.Get("/todo-items", handler.GetAll)
 	r.Get("/todo-items/:id", handler.GetByID)
 	r.Post("/todo-items", handler.Create)
-	r.Patch("/todo-items", handler.Update)
+	r.Patch("/todo-items/:id", handler.Update)
 	r.Delete("/todo-items/:id", handler.Delete)
 }
 
@@ -37,10 +38,14 @@ func (h *todoHandler) GetAll(c *fiber.Ctx) error {
 func (h *todoHandler) GetByID(c *fiber.Ctx) error {
 	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
 	if err != nil {
-		return domain.ResponseBuilder(c, "Error", 400, err.Error(), nil)
+		fmt.Println(err)
 	}
 
 	todo := h.todoUseCase.GetByID(uint(id))
+
+	if todo.Id == 0 {
+		return domain.ResponseBuilder(c, "Not Found", 404, "Todo with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+	}
 
 	return domain.ResponseBuilder(c, "Success", 200, "Success", todo)
 }
@@ -50,6 +55,11 @@ func (h *todoHandler) Create(c *fiber.Ctx) error {
 	if err := c.BodyParser(todo); err != nil {
 		return err
 	}
+
+	if (*todo == domain.Todo{}) {
+		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
+	}
+
 	err := h.todoUseCase.Create(todo)
 	if err != nil {
 		return domain.ResponseBuilder(c, "Error", 400, err.Error(), nil)
@@ -58,15 +68,23 @@ func (h *todoHandler) Create(c *fiber.Ctx) error {
 }
 
 func (h *todoHandler) Update(c *fiber.Ctx) error {
+	id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	todo := new(domain.Todo)
 	if err := c.BodyParser(todo); err != nil {
 		return err
 	}
-	err := h.todoUseCase.Update(todo)
+	newTodo, err := h.todoUseCase.Update(uint(id), todo)
 	if err != nil {
-		return domain.ResponseBuilder(c, "Error", 400, err.Error(), nil)
+		if err.Error() == "data not found" {
+			return domain.ResponseBuilder(c, "Not Found", 404, "Todo with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+		}
+		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
 	}
-	return domain.ResponseBuilder(c, "Success", 200, "Success", todo)
+	return domain.ResponseBuilder(c, "Success", 200, "Success", newTodo)
 
 }
 
@@ -78,7 +96,10 @@ func (h *todoHandler) Delete(c *fiber.Ctx) error {
 
 	err = h.todoUseCase.Delete(uint(id))
 	if err != nil {
-		return domain.ResponseBuilder(c, "Not Found", 404, "Todo with Id"+strconv.Itoa(id)+"Not Found", nil)
+		if err.Error() == "data not found" {
+			return domain.ResponseBuilder(c, "Not Found", 404, "Todo with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+		}
+		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
 	}
 
 	return domain.ResponseBuilder(c, "Success", 200, "todo was deleted", nil)

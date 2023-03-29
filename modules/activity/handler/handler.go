@@ -49,7 +49,7 @@ func (h *activityHandler) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	if activity.Title == "" {
+	if (*activity == domain.Activity{}) {
 		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
 	}
 

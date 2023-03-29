@@ -24,8 +24,8 @@ func (u *todoUsecase) Create(todo *domain.Todo) error {
 	return u.repository.Create(todo)
 }
 
-func (u *todoUsecase) Update(todo *domain.Todo) error {
-	return u.repository.Update(todo)
+func (u *todoUsecase) Update(id uint, todo *domain.Todo) (domain.Todo, error) {
+	return u.repository.Update(id, todo)
 }
 
 func (u *todoUsecase) Delete(id uint) error {

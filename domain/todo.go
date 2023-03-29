@@ -12,15 +12,15 @@ type Todo struct {
 type TodoUseCase interface {
 	GetAll(id uint) []Todo
 	GetByID(id uint) Todo
-	Create(todo *Todo) error
-	Update(todo *Todo) error
+	Create(activity *Todo) error
+	Update(id uint, activity *Todo) (Todo, error)
 	Delete(id uint) error
 }
 
 type TodoRepository interface {
 	GetAll(id uint) []Todo
 	GetByID(id uint) Todo
-	Create(todo *Todo) error
-	Update(todo *Todo) error
+	Create(activity *Todo) error
+	Update(id uint, activity *Todo) (Todo, error)
 	Delete(id uint) error
 }
