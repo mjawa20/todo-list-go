@@ -1,7 +1,7 @@
 package domain
 
 type Todos struct {
-	Id              int64  `gorm:"primaryKey" json:"todo_id"`
+	Id              int64  `gorm:"primaryKey" json:"id"`
 	ActivityGroupId int64  `gorm:"type:int" json:"activity_group_id"`
 	Title           string `gorm:"type:varchar(255)" json:"title"`
 	IsActive        bool   `json:"is_active"`

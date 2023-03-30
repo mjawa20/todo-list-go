@@ -1,7 +1,7 @@
 package domain
 
 type Activities struct {
-	Id    int64  `gorm:"primaryKey" json:"activity_id"`
+	Id    int64  `gorm:"primaryKey" json:"id"`
 	Title string `gorm:"type:varchar(255)" json:"title"`
 	Email string `gorm:"type:varchar(255)" json:"email"`
 	Model
