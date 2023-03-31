@@ -49,13 +49,7 @@ func (r *todoRepository) Update(id uint, todo *domain.Todos) (domain.Todos, erro
 		return domain.Todos{}, errors.New("data not found")
 	}
 
-	newTodo := map[string]interface{}{
-		"Title":    todo.Title,
-		"Priority": todo.Priority,
-		"IsActive": todo.IsActive,
-	}
-
-	result := connection.Model(&old).Updates(&newTodo)
+	result := connection.Model(&old).Updates(todo)
 	return *old, result.Error
 }
 

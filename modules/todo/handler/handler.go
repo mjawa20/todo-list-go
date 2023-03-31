@@ -44,7 +44,7 @@ func (h *todoHandler) GetByID(c *fiber.Ctx) error {
 	todo := h.todoUseCase.GetByID(uint(id))
 
 	if todo.Id == 0 {
-		return domain.ResponseBuilder(c, "Not Found", 404, "Todo with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+		return domain.ResponseBuilder(c, "Not Found", 404, "Todo with ID "+strconv.Itoa(int(id))+" Not Found", nil)
 	}
 
 	return domain.ResponseBuilder(c, "Success", 200, "Success", todo)
@@ -56,15 +56,21 @@ func (h *todoHandler) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	if (*todo == domain.Todos{}) {
+	if todo.Title == "" {
 		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
 	}
+
+	if todo.ActivityGroupId == 0 {
+		return domain.ResponseBuilder(c, "Bad Request", 400, "activity_group_id cannot be null", nil)
+	}
+
+	todo.IsActive = true
 
 	err := h.todoUseCase.Create(todo)
 	if err != nil {
 		return domain.ResponseBuilder(c, "Error", 400, err.Error(), nil)
 	}
-	return domain.ResponseBuilder(c, "Success", 200, "Success", todo)
+	return domain.ResponseBuilder(c, "Success", 201, "Success", todo)
 }
 
 func (h *todoHandler) Update(c *fiber.Ctx) error {
@@ -80,7 +86,7 @@ func (h *todoHandler) Update(c *fiber.Ctx) error {
 	newTodo, err := h.todoUseCase.Update(uint(id), todo)
 	if err != nil {
 		if err.Error() == "data not found" {
-			return domain.ResponseBuilder(c, "Not Found", 404, "Todo with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+			return domain.ResponseBuilder(c, "Not Found", 404, "Todo with ID "+strconv.Itoa(int(id))+" Not Found", nil)
 		}
 		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
 	}
@@ -97,10 +103,10 @@ func (h *todoHandler) Delete(c *fiber.Ctx) error {
 	err = h.todoUseCase.Delete(uint(id))
 	if err != nil {
 		if err.Error() == "data not found" {
-			return domain.ResponseBuilder(c, "Not Found", 404, "Todo with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+			return domain.ResponseBuilder(c, "Not Found", 404, "Todo with ID "+strconv.Itoa(int(id))+" Not Found", nil)
 		}
 		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
 	}
 
-	return domain.ResponseBuilder(c, "Success", 200, "todo was deleted", nil)
+	return domain.ResponseBuilder(c, "Success", 200, "todo was deleted", fiber.Map{})
 }

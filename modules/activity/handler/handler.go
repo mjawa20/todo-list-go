@@ -37,7 +37,7 @@ func (h *activityHandler) GetByID(c *fiber.Ctx) error {
 
 	activity := h.activityUseCase.GetByID(uint(id))
 	if activity.Id == 0 {
-		return domain.ResponseBuilder(c, "Not Found", 404, "Activity with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+		return domain.ResponseBuilder(c, "Not Found", 404, "Activity with ID "+strconv.Itoa(int(id))+" Not Found", nil)
 	}
 
 	return domain.ResponseBuilder(c, "Success", 200, "Success", activity)
@@ -49,7 +49,7 @@ func (h *activityHandler) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	if (*activity == domain.Activities{}) {
+	if activity.Title == "" {
 		return domain.ResponseBuilder(c, "Bad Request", 400, "title cannot be null", nil)
 	}
 
@@ -57,7 +57,7 @@ func (h *activityHandler) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return domain.ResponseBuilder(c, "Error", 404, err.Error(), nil)
 	}
-	return domain.ResponseBuilder(c, "Success", 200, "Success", activity)
+	return domain.ResponseBuilder(c, "Success", 201, "Success", activity)
 }
 
 func (h *activityHandler) Update(c *fiber.Ctx) error {
@@ -78,7 +78,7 @@ func (h *activityHandler) Update(c *fiber.Ctx) error {
 	newActivity, err := h.activityUseCase.Update(uint(id), activity)
 	if err != nil {
 		if err.Error() == "data not found" {
-			return domain.ResponseBuilder(c, "Not Found", 404, "Activity with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+			return domain.ResponseBuilder(c, "Not Found", 404, "Activity with ID "+strconv.Itoa(int(id))+" Not Found", nil)
 		}
 		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
 	}
@@ -95,10 +95,10 @@ func (h *activityHandler) Delete(c *fiber.Ctx) error {
 	err = h.activityUseCase.Delete(uint(id))
 	if err != nil {
 		if err.Error() == "data not found" {
-			return domain.ResponseBuilder(c, "Not Found", 404, "Activity with Id "+strconv.Itoa(int(id))+" Not Found", nil)
+			return domain.ResponseBuilder(c, "Not Found", 404, "Activity with ID "+strconv.Itoa(int(id))+" Not Found", nil)
 		}
 		return domain.ResponseBuilder(c, "Error", 500, err.Error(), nil)
 	}
 
-	return domain.ResponseBuilder(c, "Success", 200, "activity was deleted", domain.Activities{})
+	return domain.ResponseBuilder(c, "Success", 200, "activity was deleted", fiber.Map{})
 }
